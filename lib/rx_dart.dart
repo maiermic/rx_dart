@@ -15,6 +15,8 @@
 /// it can be used like a regular Dart [Stream].
 library rx_dart;
 
-import 'dart:async' show Stream;
+import 'dart:async';
 
-export 'src/rx_stream.dart';
+part 'src/rx_stream_wrapper.dart';
+part 'src/rx_stream_type.dart';
+part 'src/rx_stream_extensions.dart';

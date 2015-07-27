@@ -1,47 +1,39 @@
 // Copyright (c) 2015, <Michael Maier>. All rights reserved. Use of this source code
 // is governed by a MIT-style license that can be found in the LICENSE file.
 
-library rx_dart.stream;
-
-import 'dart:async';
+part of rx_dart;
 
 
-/// Wrapper of a [Stream].
-class StreamWrapper<T> implements Stream<T> {
+/// A wrapper of a [Stream].
+///
+/// Use a sub class to provide extra methods on a [Stream]. Use an instance
+/// of the sub class as a wrapper for the actual [Stream] instance.
+///
+/// [T] is the event type of this stream. [S] is the type of the concrete class
+/// that inherits from [StreamWrapper]. The event type of [S] should be
+/// specified as dynamic, even though it is known as [T] in the class
+/// definition of [S]. See documentation of [StreamWrapperType] for further
+/// explanation about this design decision.
+///
+/// A concrete sub class of [StreamWrapper] has to implement the method
+/// [_newStreamWrapper] that creates a new [StreamWrapper] of the same type as
+/// the concrete sub class [S]. Thus, if the return value of a wrapped method
+/// is [Stream], it can be wrapped again as [S].
+///
+abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements Stream<T> {
+  /// Creates a new [StreamWrapper] of the same type as this [StreamWrapper] instance.
+  ///
+  /// Since this method is abstract, it will be overridden by a concrete sub class [S].
+  /// Thus, the created [StreamWrapper] will be of the same type as this concrete sub class.
+  ///
+  S _newStreamWrapper(Stream source);
+
   /// Wrapped stream.
   Stream<T> stream;
 
-  /// Creates a stream wrapper.
+  /// Initialize the stream of this wrapper.
   ///
-  /// If [stream] is omitted, an empty stream is wrapped.
-  ///
-  StreamWrapper([this.stream = const Stream.empty()]);
-
-  /// Creates an empty broadcast stream.
-  ///
-  /// This is a stream which does nothing except sending a done event
-  /// when it's listened to.
-  ///
-  StreamWrapper.empty() : this();
-
-  /// Creates a new single-subscription stream from the future.
-  ///
-  /// When the future completes, the stream will fire one event, either
-  /// data or error, and then close with a done-event.
-  ///
-  StreamWrapper.fromFuture(Future<T> future) : this(new Stream.fromFuture(future));
-
-  /// Creates a single-subscription stream that gets its data from [data].
-  ///
-  /// The iterable is iterated when the stream receives a listener, and stops
-  /// iterating if the listener cancels the subscription.
-  ///
-  /// If iterating [data] throws an error, the stream ends immediately with
-  /// that error. No done event will be sent (iteration is not complete), but no
-  /// further data events will be generated either, since iteration cannot
-  /// continue.
-  ///
-  StreamWrapper.fromIterable(Iterable<T> data) : this(new Stream.fromIterable(data));
+  StreamWrapper(this.stream);
 
   /// Checks whether [test] accepts any element provided by this stream.
   ///
@@ -82,8 +74,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// subscription when there are no listeners.
   ///
   @override
-  StreamWrapper<T> asBroadcastStream({void onListen(StreamSubscription<T> subscription), void onCancel(StreamSubscription<T> subscription)}) {
-    return new StreamWrapper(stream.asBroadcastStream(onListen: onListen, onCancel: onCancel));
+  S asBroadcastStream({void onListen(StreamSubscription<T> subscription), void onCancel(StreamSubscription<T> subscription)}) {
+    return _newStreamWrapper(stream.asBroadcastStream(onListen: onListen, onCancel: onCancel));
   }
 
   /// Creates a new stream with the events of a stream per original event.
@@ -99,8 +91,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// The returned stream is a broadcast stream if this stream is.
   ///
   @override
-  StreamWrapper asyncExpand(Stream convert(T event)) {
-    return new StreamWrapper(stream.asyncExpand(convert));
+  S asyncExpand(Stream convert(T event)) {
+    return _newStreamWrapper(stream.asyncExpand(convert));
   }
 
   /// Creates a new stream with each data event of this stream asynchronously
@@ -113,8 +105,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// The returned stream is a broadcast stream if this stream is.
   ///
   @override
-  StreamWrapper asyncMap(convert(T event)) {
-    return new StreamWrapper(stream.asyncMap(convert));
+  S asyncMap(convert(T event)) {
+    return _newStreamWrapper(stream.asyncMap(convert));
   }
 
   /// Checks whether [needle] occurs in the elements provided by this stream.
@@ -140,8 +132,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// will individually perform the `equals` test.
   ///
   @override
-  StreamWrapper<T> distinct([bool equals(T previous, T next)]) {
-    return new StreamWrapper(stream.distinct(equals));
+  S distinct([bool equals(T previous, T next)]) {
+    return _newStreamWrapper(stream.distinct(equals));
   }
 
   /// Discards all data on the stream, but signals when it's done or an error
@@ -201,8 +193,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// will individually call `convert` and expand the events.
   ///
   @override
-  StreamWrapper expand(Iterable convert(T value)) {
-    return new StreamWrapper(stream.expand(convert));
+  S expand(Iterable convert(T value)) {
+    return _newStreamWrapper(stream.expand(convert));
   }
 
   /// Returns the first element of the stream.
@@ -294,8 +286,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// will individually perform the `test` and handle the error.
   ///
   @override
-  StreamWrapper<T> handleError(Function onError, {bool test(error)}) {
-    return new StreamWrapper(stream.handleError(onError, test: test));
+  S handleError(Function onError, {bool test(error)}) {
+    return _newStreamWrapper(stream.handleError(onError, test: test));
   }
 
   /// Reports whether this stream is a broadcast stream.
@@ -386,8 +378,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// will individually execute `map` for each event.
   ///
   @override
-  StreamWrapper map(convert(T event)) {
-    return new StreamWrapper(stream.map(convert));
+  S map(convert(T event)) {
+    return _newStreamWrapper(stream.map(convert));
   }
 
   /// Pipe the events of this stream into [streamConsumer].
@@ -446,8 +438,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// the returned stream is listened to.
   ///
   @override
-  StreamWrapper<T> skip(int count) {
-    return new StreamWrapper(stream.skip(count));
+  S skip(int count) {
+    return _newStreamWrapper(stream.skip(count));
   }
 
   /// Skip data events from this stream while they are matched by [test].
@@ -462,8 +454,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// the returned stream is listened to.
   ///
   @override
-  StreamWrapper<T> skipWhile(bool test(T element)) {
-    return new StreamWrapper(stream.skipWhile(test));
+  S skipWhile(bool test(T element)) {
+    return _newStreamWrapper(stream.skipWhile(test));
   }
 
   /// Provides at most the first [n] values of this stream.
@@ -486,8 +478,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// the returned stream is listened to.
   ///
   @override
-  StreamWrapper<T> take(int count) {
-    return new StreamWrapper(stream.take(count));
+  S take(int count) {
+    return _newStreamWrapper(stream.take(count));
   }
 
   /// Forwards data events while [test] is successful.
@@ -508,8 +500,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// the returned stream is listened to.
   ///
   @override
-  StreamWrapper<T> takeWhile(bool test(T element)) {
-    return new StreamWrapper(stream.takeWhile(test));
+  S takeWhile(bool test(T element)) {
+    return _newStreamWrapper(stream.takeWhile(test));
   }
 
   /// Creates a new stream with the same events as this stream.
@@ -534,8 +526,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// and the subscriptions' timers can be paused individually.
   ///
   @override
-  StreamWrapper timeout(Duration timeLimit, {void onTimeout(EventSink sink)}) {
-    return new StreamWrapper(stream.timeout(timeLimit, onTimeout: onTimeout));
+  S timeout(Duration timeLimit, {void onTimeout(EventSink sink)}) {
+    return _newStreamWrapper(stream.timeout(timeLimit, onTimeout: onTimeout));
   }
 
   /** Collects the data of this stream in a [List]. */
@@ -565,8 +557,8 @@ class StreamWrapper<T> implements Stream<T> {
   /// broadcast stream or not.
   ///
   @override
-  StreamWrapper transform(StreamTransformer<T, dynamic> streamTransformer) {
-    return new StreamWrapper(stream.transform(streamTransformer));
+  S transform(StreamTransformer<T, dynamic> streamTransformer) {
+    return _newStreamWrapper(stream.transform(streamTransformer));
   }
 
   /// Creates a new stream from this stream that discards some data events.
@@ -579,7 +571,7 @@ class StreamWrapper<T> implements Stream<T> {
   /// will individually perform the `test`.
   ///
   @override
-  StreamWrapper<T> where(bool test(T event)) {
-    return new StreamWrapper(stream.where(test));
+  S where(bool test(T event)) {
+    return _newStreamWrapper(stream.where(test));
   }
 }
