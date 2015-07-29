@@ -19,20 +19,17 @@ part of rx_dart;
 /// [_newStreamWrapper] that creates a new [StreamWrapper] of the same type as
 /// the concrete sub class [S]. Thus, if the return value of a wrapped method
 /// is [Stream], it can be wrapped again as [S].
-///
 abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements Stream<T> {
   /// Creates a new [StreamWrapper] of the same type as this [StreamWrapper] instance.
   ///
   /// Since this method is abstract, it will be overridden by a concrete sub class [S].
   /// Thus, the created [StreamWrapper] will be of the same type as this concrete sub class.
-  ///
   S _newStreamWrapper(Stream source);
 
   /// Wrapped stream.
   Stream<T> stream;
 
   /// Initialize the stream of this wrapper.
-  ///
   StreamWrapper(this.stream);
 
   /// Checks whether [test] accepts any element provided by this stream.
@@ -47,7 +44,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// Internally the method cancels its subscription after this element. This
   /// means that single-subscription (non-broadcast) streams are closed and
   /// cannot be reused after a call to this method.
-  ///
   @override
   Future<bool> any(bool test(T element)) {
     return stream.any(test);
@@ -72,7 +68,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// Use the callbacks, for example, for pausing the underlying subscription
   /// while having no subscribers to prevent losing events, or canceling the
   /// subscription when there are no listeners.
-  ///
   @override
   S asBroadcastStream({void onListen(StreamSubscription<T> subscription), void onCancel(StreamSubscription<T> subscription)}) {
     return _newStreamWrapper(stream.asBroadcastStream(onListen: onListen, onCancel: onCancel));
@@ -89,7 +84,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// just as if it returned an empty stream.
   ///
   /// The returned stream is a broadcast stream if this stream is.
-  ///
   @override
   S asyncExpand(Stream convert(T event)) {
     return _newStreamWrapper(stream.asyncExpand(convert));
@@ -103,7 +97,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// continuing with its result.
   ///
   /// The returned stream is a broadcast stream if this stream is.
-  ///
   @override
   S asyncMap(convert(T event)) {
     return _newStreamWrapper(stream.asyncMap(convert));
@@ -113,7 +106,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// Completes the [Future] when the answer is known.
   /// If this stream reports an error, the [Future] will report that error.
-  ///
   @override
   Future<bool> contains(Object needle) {
     return stream.contains(needle);
@@ -130,7 +122,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// If a broadcast stream is listened to more than once, each subscription
   /// will individually perform the `equals` test.
-  ///
   @override
   S distinct([bool equals(T previous, T next)]) {
     return _newStreamWrapper(stream.distinct(equals));
@@ -145,7 +136,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// In case of a `done` event the future completes with the given
   /// [futureValue].
-  ///
   @override
   Future drain([futureValue]) {
     return stream.drain(futureValue);
@@ -165,7 +155,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// If a done event occurs before the value is found, the future completes
   /// with a [RangeError].
-  ///
   @override
   Future<T> elementAt(int index) {
     return stream.elementAt(index);
@@ -175,7 +164,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// Completes the [Future] when the answer is known.
   /// If this stream reports an error, the [Future] will report that error.
-  ///
   @override
   Future<bool> every(bool test(T element)) {
     return stream.every(test);
@@ -191,7 +179,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// If a broadcast stream is listened to more than once, each subscription
   /// will individually call `convert` and expand the events.
-  ///
   @override
   S expand(Iterable convert(T value)) {
     return _newStreamWrapper(stream.expand(convert));
@@ -213,7 +200,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// Except for the type of the error, this method is equivalent to
   /// [:this.elementAt(0):].
-  ///
   @override
   Future<T> get first => stream.first;
 
@@ -236,14 +222,12 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// If an error occurs, or if this stream ends without finding a match and
   /// with no [defaultValue] function provided, the future will receive an
   /// error.
-  ///
   @override
   Future firstWhere(bool test(T element), {Object defaultValue()}) {
     return stream.firstWhere(test, defaultValue: defaultValue);
   }
 
   /// Reduces a sequence of values by repeatedly applying [combine].
-  ///
   @override
   Future fold(initialValue, combine(previous, T element)) {
     return stream.fold(initialValue, combine);
@@ -254,7 +238,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// Completes the returned [Future] when all events of the stream
   /// have been processed. Completes the future with an error if the
   /// stream has an error event, or if [action] throws.
-  ///
   @override
   Future forEach(void action(T element)) {
     return stream.forEach(action);
@@ -285,14 +268,12 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// If a broadcast stream is listened to more than once, each subscription
   /// will individually perform the `test` and handle the error.
-  ///
   @override
   S handleError(Function onError, {bool test(error)}) {
     return _newStreamWrapper(stream.handleError(onError, test: test));
   }
 
   /// Reports whether this stream is a broadcast stream.
-  ///
   @override
   bool get isBroadcast => stream.isBroadcast;
 
@@ -303,7 +284,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// Internally the method cancels its subscription after the first element.
   /// This means that single-subscription (non-broadcast) streams are closed and
   /// cannot be reused after a call to this getter.
-  ///
   @override
   Future<bool> get isEmpty => stream.isEmpty;
 
@@ -315,7 +295,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// Any error in the stream causes the future to complete with that
   /// error. Otherwise it completes with the collected string when
   /// the "done" event arrives.
-  ///
   @override
   Future<String> join([String separator = ""]) {
     return stream.join(separator);
@@ -328,7 +307,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// If this stream is empty (a done event occurs before the first data event),
   /// the resulting future completes with a [StateError].
-  ///
   @override
   Future<T> get last => stream.last;
 
@@ -337,7 +315,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// As [firstWhere], except that the last matching element is found.
   /// That means that the result cannot be provided before this stream
   /// is done.
-  ///
   @override
   Future lastWhere(bool test(T element), {Object defaultValue()}) {
     return stream.lastWhere(test, defaultValue: defaultValue);
@@ -365,7 +342,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// If [cancelOnError] is true, the subscription is ended when
   /// the first error is reported. The default is false.
-  ///
   @override
   StreamSubscription<T> listen(void onData(T event), {Function onError, void onDone(), bool cancelOnError}) {
     return stream.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
@@ -377,7 +353,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// If a broadcast stream is listened to more than once, each subscription
   /// will individually execute `map` for each event.
-  ///
   @override
   S map(convert(T event)) {
     return _newStreamWrapper(stream.map(convert));
@@ -399,14 +374,12 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// then the consumer is expected to be closed, and won't be closed again.
   /// In that case the returned future completes with the error from calling
   /// `addStream`.
-  ///
   @override
   Future pipe(StreamConsumer<T> streamConsumer) {
     return stream.pipe(streamConsumer);
   }
 
   /// Reduces a sequence of values by repeatedly applying [combine].
-  ///
   @override
   Future<T> reduce(T combine(T previous, T element)) {
     return stream.reduce(combine);
@@ -418,7 +391,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// resulting future is completed with that error.
   ///
   /// If [this] is empty or has more than one element throws a [StateError].
-  ///
   @override
   Future<T> get single => stream.single;
 
@@ -426,7 +398,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// Like [lastMatch], except that it is an error if more than one
   /// matching element occurs in the stream.
-  ///
   @override
   Future<T> singleWhere(bool test(T element)) {
     return stream.singleWhere(test);
@@ -437,7 +408,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// For a broadcast stream, the events are only counted from the time
   /// the returned stream is listened to.
-  ///
   @override
   S skip(int count) {
     return _newStreamWrapper(stream.skip(count));
@@ -453,7 +423,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// For a broadcast stream, the events are only tested from the time
   /// the returned stream is listened to.
-  ///
   @override
   S skipWhile(bool test(T element)) {
     return _newStreamWrapper(stream.skipWhile(test));
@@ -477,7 +446,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// For a broadcast stream, the events are only counted from the time
   /// the returned stream is listened to.
-  ///
   @override
   S take(int count) {
     return _newStreamWrapper(stream.take(count));
@@ -499,7 +467,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// For a broadcast stream, the events are only tested from the time
   /// the returned stream is listened to.
-  ///
   @override
   S takeWhile(bool test(T element)) {
     return _newStreamWrapper(stream.takeWhile(test));
@@ -525,7 +492,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// If a broadcast stream is listened to more than once, each subscription
   /// will have its individually timer that starts counting on listen,
   /// and the subscriptions' timers can be paused individually.
-  ///
   @override
   S timeout(Duration timeLimit, {void onTimeout(EventSink sink)}) {
     return _newStreamWrapper(stream.timeout(timeLimit, onTimeout: onTimeout));
@@ -544,7 +510,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// element to the set, or use
   /// `toList().then((list) => new SomeOtherSet.from(list))`
   /// to create the set.
-  ///
   @override
   Future<Set<T>> toSet() {
     return stream.toSet();
@@ -556,7 +521,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   ///
   /// The `streamTransformer` can decide whether it wants to return a
   /// broadcast stream or not.
-  ///
   @override
   S transform(StreamTransformer<T, dynamic> streamTransformer) {
     return _newStreamWrapper(stream.transform(streamTransformer));
@@ -570,7 +534,6 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
   /// The returned stream is a broadcast stream if this stream is.
   /// If a broadcast stream is listened to more than once, each subscription
   /// will individually perform the `test`.
-  ///
   @override
   S where(bool test(T event)) {
     return _newStreamWrapper(stream.where(test));

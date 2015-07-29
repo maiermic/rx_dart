@@ -11,7 +11,6 @@ part of rx_dart;
 ///
 /// [Stream] owns methods that return a stream of the same type (for example
 /// `skip`) or an unknown type (for example `map`).
-///
 abstract class StreamWrapperType<T, W extends StreamWrapper<T, W>> {
   W asBroadcastStream({void onListen(StreamSubscription<T> subscription),
                       void onCancel(StreamSubscription<T> subscription)});
