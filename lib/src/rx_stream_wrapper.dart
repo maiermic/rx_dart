@@ -242,7 +242,8 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
     return stream.firstWhere(test, defaultValue: defaultValue);
   }
 
-  /** Reduces a sequence of values by repeatedly applying [combine]. */
+  /// Reduces a sequence of values by repeatedly applying [combine].
+  ///
   @override
   Future fold(initialValue, combine(previous, T element)) {
     return stream.fold(initialValue, combine);
@@ -342,7 +343,7 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
     return stream.lastWhere(test, defaultValue: defaultValue);
   }
 
-  /** Counts the elements in the stream. */
+  /// Counts the elements in the stream.
   @override
   Future<int> get length => stream.length;
 
@@ -530,7 +531,7 @@ abstract class StreamWrapper<T, S extends StreamWrapper<dynamic, S>> implements 
     return _newStreamWrapper(stream.timeout(timeLimit, onTimeout: onTimeout));
   }
 
-  /** Collects the data of this stream in a [List]. */
+  /// Collects the data of this stream in a [List].
   @override
   Future<List<T>> toList() {
     return stream.toList();
