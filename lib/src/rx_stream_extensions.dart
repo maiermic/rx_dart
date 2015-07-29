@@ -41,4 +41,18 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   RxStream _newStreamWrapper(Stream source) {
     return new RxStream(source);
   }
+
+  /// Prepend a sequence of values to this stream.
+  RxStream<T> startWith(Iterable<T> values) {
+    StreamController<T> controller;
+    onListen() async {
+      for (T value in values) {
+        controller.add(value);
+      }
+      await controller.addStream(stream);
+      controller.close();
+    }
+    controller = new StreamController<T>(sync: true, onListen: onListen);
+    return new RxStream<T>(controller.stream);
+  }
 }
