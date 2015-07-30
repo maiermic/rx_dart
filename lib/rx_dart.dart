@@ -16,6 +16,7 @@
 library rx_dart;
 
 import 'dart:async';
+import 'package:rx_dart/rx_stream_combinations.dart' as Combinations;
 
 part 'src/rx_stream_wrapper.dart';
 part 'src/rx_stream_type.dart';

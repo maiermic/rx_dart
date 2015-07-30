@@ -55,4 +55,13 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     controller = new StreamController<T>(sync: true, onListen: onListen);
     return new RxStream<T>(controller.stream);
   }
+
+  /// Concatenates this stream with all of the specified streams, as long as
+  /// the previous observable sequence terminated successfully.
+  RxStream<T> concat(Iterable<Stream<T>> streams) {
+    var allStreams = new List<Stream<T>>()
+        ..add(stream)
+        ..addAll(streams);
+    return Combinations.concat(allStreams);
+  }
 }
