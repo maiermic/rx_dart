@@ -24,3 +24,10 @@ RxStream concat(Iterable<Stream> streams) {
 RxStream merge(Iterable<Stream> streams) {
   return new RxStream(StreamGroup.merge(streams));
 }
+
+/// Merges the specified streams into one stream by emitting a list with the
+/// elements of the stream at corresponding indexes whenever all of the
+/// streams have produced an element.
+RxStream zipArray(Iterable<Stream> streams) {
+  return new RxStream(new StreamZip(streams));
+}
