@@ -4,6 +4,7 @@ library rx_dart.combinations;
 import 'dart:async';
 
 import 'package:rx_dart/rx_dart.dart';
+import 'package:async/async.dart';
 
 /// Concatenates all of the specified streams, as long as the previous
 /// observable sequence terminated successfully.
@@ -17,4 +18,9 @@ RxStream concat(Iterable<Stream> streams) {
   }
   controller = new StreamController(sync: true, onListen: onListen);
   return new RxStream(controller.stream);
+}
+
+/// Merges all of the specified streams into a single stream.
+RxStream merge(Iterable<Stream> streams) {
+  return new RxStream(StreamGroup.merge(streams));
 }

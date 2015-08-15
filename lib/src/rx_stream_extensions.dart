@@ -64,4 +64,12 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
         ..addAll(streams);
     return Combinations.concat(allStreams);
   }
+
+  /// Merges this stream with all of the specified streams into a single stream.
+  RxStream<T> merge(Iterable<Stream<T>> streams) {
+    var allStreams = new List<Stream<T>>()
+        ..add(stream)
+        ..addAll(streams);
+    return Combinations.merge(allStreams);
+  }
 }
