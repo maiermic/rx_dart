@@ -82,4 +82,26 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
         ..addAll(streams);
     return Combinations.zipArray(allStreams);
   }
+
+  /// Projects each element of a stream to a stream and merges the resulting
+  /// streams into one stream.
+  RxStream flatMap(Stream selector(T value)) {
+    StreamController controller;
+    List<Future> onDones = [];
+    onListen() async {
+      stream.map(selector).listen(
+        (Stream s) {
+          var completer = new Completer();
+          onDones.add(completer.future);
+          s.listen(controller.add, onDone: completer.complete);
+        },
+        onDone: () async {
+          await Future.wait(onDones);
+          controller.close();
+        }
+      );
+    }
+    controller = new StreamController(sync: true, onListen: onListen);
+    return new RxStream(controller.stream);
+  }
 }
