@@ -31,3 +31,10 @@ RxStream merge(Iterable<Stream> streams) {
 RxStream zipArray(Iterable<Stream> streams) {
   return new RxStream(new StreamZip(streams));
 }
+
+/// Merges the specified streams into one stream by using the selector function
+/// whenever all of the streams have produced an element at a corresponding
+/// index.
+RxStream zip(Iterable<Stream> streams, Function resultSelector) {
+  return zipArray(streams).map((args) => Function.apply(resultSelector, args));
+}
