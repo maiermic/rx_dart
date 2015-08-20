@@ -104,4 +104,30 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     controller = new StreamController(sync: true, onListen: onListen);
     return new RxStream(controller.stream);
   }
+
+  /// Applies an accumulator function over a stream and returns each
+  /// intermediate result. The optional seed value is used as the initial
+  /// accumulator value.
+  RxStream scan(combine(acc, T element), [seed]) {
+    var controller = new StreamController(sync: true);
+    () async {
+      var init = (seed != null ? seed : controller);
+      stream.fold(init, (acc, T element) {
+        if (identical(init, acc)) {
+          if (init == seed) {
+            return combine(acc, element);
+          }
+          return element;
+        }
+        controller.add(acc);
+        return combine(acc, element);
+      }).then((last) {
+        if (!identical(init, last)) {
+          controller.add(last);
+        }
+        controller.close();
+      });
+    }();
+    return new RxStream(controller.stream);
+  }
 }

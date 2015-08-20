@@ -48,4 +48,42 @@ void main() {
       expect(stream.toList(), completion(equals([0, 1, 2, 3, 4, 5])));
     });
   });
+
+  group('scan', () {
+    int _sum(int acc, int x) => acc + x;
+
+    group('without seed', () {
+      test('on empty stream completes empty', () {
+        var stream = new RxStream.empty().scan(_sum);
+        expect(stream.isEmpty, completion(isTrue));
+      });
+
+      test('on single element stream emits element', () {
+        var stream = new RxStream.fromIterable([1]).scan(_sum);;
+        expect(stream.toList(), completion(equals([1])));
+      });
+
+      test('on stream emits combined elements', () {
+        var stream = new RxStream.fromIterable([1, 2, 4]).scan(_sum);;
+        expect(stream.toList(), completion(equals([1, 3, 7])));
+      });
+    });
+
+    group('with seed', () {
+      test('on empty stream completes empty', () {
+        var stream = new RxStream.empty().scan(_sum, 4);
+        expect(stream.isEmpty, completion(isTrue));
+      });
+
+      test('on single element stream emits element', () {
+        var stream = new RxStream.fromIterable([1]).scan(_sum, 4);;
+        expect(stream.toList(), completion(equals([5])));
+      });
+
+      test('on stream emits combined elements', () {
+        var stream = new RxStream.fromIterable([1, 2, 4]).scan(_sum, 4);;
+        expect(stream.toList(), completion(equals([5, 7, 11])));
+      });
+    });
+  });
 }
