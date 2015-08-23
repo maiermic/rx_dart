@@ -65,6 +65,31 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return Combinations.concat(allStreams);
   }
 
+  /// Projects each element of a stream to a stream and merges the resulting
+  /// streams into one stream.
+  RxStream concatMap(Stream selector(T value)) {
+    StreamController controller;
+    Future previousDone = new Future.value();
+    onListen() async {
+      stream.map(selector).listen(
+          (Stream s) async {
+            final previous = previousDone;
+            final done = new Completer();
+            previousDone = done.future;
+            await previous;
+            await controller.addStream(s);
+            done.complete();
+          },
+          onDone: () async {
+            await previousDone;
+            controller.close();
+          }
+      );
+    }
+    controller = new StreamController(sync: true, onListen: onListen);
+    return new RxStream(controller.stream);
+  }
+
   /// Merges this stream with all of the specified streams into a single stream.
   RxStream<T> merge(Iterable<Stream<T>> streams) {
     var allStreams = new List<Stream<T>>()
