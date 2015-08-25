@@ -79,6 +79,11 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(controller.stream);
   }
 
+  /// Time shifts the stream by [duration].
+  /// The relative time intervals between the values are preserved.
+  RxStream<T> delay(Duration duration) =>
+      asyncMap((event) => new Future.delayed(duration, () => event));
+
   /// Projects each element of a stream to a stream and merges the resulting
   /// streams into one stream.
   RxStream flatMap(Stream selector(T value)) {
