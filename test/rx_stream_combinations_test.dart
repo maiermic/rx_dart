@@ -45,6 +45,22 @@ void main() {
     });
   });
 
+  group('combineLatest', () {
+    test('of two streams', () {
+      var c1 = new StreamController<int>(sync: true);
+      var c2 = new StreamController<int>(sync: true);
+      RxStream<List<int>> stream = combineLatest([c1.stream, c2.stream]);
+      expect(stream.toList(), completion(equals([[0, 3], [0, 4], [1, 4]])));
+
+      c1.add(0);
+      c2.add(3);
+      c2.add(4);
+      c2.close();
+      c1.add(1);
+      c1.close();
+    });
+  });
+
   group('zipArray', () {
     test('two non broadcast streams one after another', () {
       var s1 = new Stream<int>.fromIterable([0, 1]);

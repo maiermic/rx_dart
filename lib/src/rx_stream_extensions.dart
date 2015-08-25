@@ -56,6 +56,17 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream<T>(controller.stream);
   }
 
+  /// Merges this stream with all of the specified streams into one stream by
+  /// using the selector function whenever any of the streams produces an
+  /// element. If the result selector is omitted, a list with the elements will
+  /// be yielded.
+  RxStream<T> combineLatest(Iterable<Stream<T>> streams) {
+    var allStreams = new List<Stream<T>>()
+        ..add(stream)
+        ..addAll(streams);
+    return Combinations.combineLatest(allStreams);
+  }
+
   /// Concatenates this stream with all of the specified streams, as long as
   /// the previous observable sequence terminated successfully.
   RxStream<T> concat(Iterable<Stream<T>> streams) {

@@ -25,6 +25,30 @@ RxStream merge(Iterable<Stream> streams) {
   return new RxStream(StreamGroup.merge(streams));
 }
 
+/// Merges all of the specified streams into one stream by using the selector
+/// function whenever any of the streams produces an element. If the result
+/// selector is omitted, a list with the elements will be yielded.
+RxStream combineLatest(Iterable<Stream> streams) {
+  var controller = new StreamController(sync: true);
+  var latestValues = new Map<Stream, dynamic>();
+  var pairs =
+      streams.map((stream) => stream.map((event) => new _Pair(stream, event)));
+  onListen(_Pair pair) {
+    latestValues[pair.stream] = pair.event;
+    if (latestValues.length == streams.length) {
+      controller.add(new List.unmodifiable(latestValues.values));
+    }
+  }
+  merge(pairs).listen(onListen, onDone: controller.close);
+  return new RxStream(controller.stream);
+}
+
+class _Pair {
+  final Stream stream;
+  final event;
+  _Pair(this.stream, this.event);
+}
+
 /// Merges the specified streams into one stream by emitting a list with the
 /// elements of the stream at corresponding indexes whenever all of the
 /// streams have produced an element.
