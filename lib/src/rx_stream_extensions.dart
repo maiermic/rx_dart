@@ -42,6 +42,12 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(source);
   }
 
+  /// Prepends [stream] to [streams].
+  Iterable<Stream<T>> _streamWith(Iterable<Stream<T>> streams) =>
+      new List<Stream<T>>()
+          ..add(stream)
+          ..addAll(streams);
+
   /// Prepend a sequence of values to this stream.
   RxStream<T> startWith(Iterable<T> values) {
     StreamController<T> controller;
@@ -60,21 +66,13 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   /// using the selector function whenever any of the streams produces an
   /// element. If the result selector is omitted, a list with the elements will
   /// be yielded.
-  RxStream<T> combineLatest(Iterable<Stream<T>> streams) {
-    var allStreams = new List<Stream<T>>()
-        ..add(stream)
-        ..addAll(streams);
-    return Combinations.combineLatest(allStreams);
-  }
+  RxStream<T> combineLatest(Iterable<Stream<T>> streams) =>
+      Combinations.combineLatest(_streamWith(streams));
 
   /// Concatenates this stream with all of the specified streams, as long as
   /// the previous observable sequence terminated successfully.
-  RxStream<T> concat(Iterable<Stream<T>> streams) {
-    var allStreams = new List<Stream<T>>()
-        ..add(stream)
-        ..addAll(streams);
-    return Combinations.concat(allStreams);
-  }
+  RxStream<T> concat(Iterable<Stream<T>> streams) =>
+      Combinations.concat(_streamWith(streams));
 
   /// Projects each element of a stream to a stream and merges the resulting
   /// streams into one stream.
@@ -102,32 +100,20 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   }
 
   /// Merges this stream with all of the specified streams into a single stream.
-  RxStream<T> merge(Iterable<Stream<T>> streams) {
-    var allStreams = new List<Stream<T>>()
-        ..add(stream)
-        ..addAll(streams);
-    return Combinations.merge(allStreams);
-  }
+  RxStream<T> merge(Iterable<Stream<T>> streams) =>
+      Combinations.merge(_streamWith(streams));
 
   /// Merges this stream with all the specified streams into one stream by
   /// using the selector function whenever all of the streams have produced
   /// an element at a corresponding index.
-  RxStream<T> zip(Iterable<Stream<T>> streams, Function resultSelector) {
-    var allStreams = new List<Stream<T>>()
-      ..add(stream)
-      ..addAll(streams);
-    return Combinations.zip(allStreams, resultSelector);
-  }
+  RxStream<T> zip(Iterable<Stream<T>> streams, Function resultSelector) =>
+      Combinations.zip(_streamWith(streams), resultSelector);
 
   /// Merges this stream with all the specified streams into one stream by
   /// emitting a list with the elements of the stream at corresponding indexes
   /// whenever all of the streams have produced an element.
-  RxStream<T> zipArray(Iterable<Stream<T>> streams) {
-    var allStreams = new List<Stream<T>>()
-        ..add(stream)
-        ..addAll(streams);
-    return Combinations.zipArray(allStreams);
-  }
+  RxStream<T> zipArray(Iterable<Stream<T>> streams) =>
+      Combinations.zipArray(_streamWith(streams));
 
   /// Projects each element of a stream to a stream and merges the resulting
   /// streams into one stream.
