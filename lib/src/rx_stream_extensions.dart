@@ -106,13 +106,13 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   /// Merges this stream with all the specified streams into one stream by
   /// using the selector function whenever all of the streams have produced
   /// an element at a corresponding index.
-  RxStream<T> zip(Iterable<Stream<T>> streams, Function resultSelector) =>
+  RxStream zip(Iterable<Stream<T>> streams, Function resultSelector) =>
       Combinations.zip(_streamWith(streams), resultSelector);
 
   /// Merges this stream with all the specified streams into one stream by
   /// emitting a list with the elements of the stream at corresponding indexes
   /// whenever all of the streams have produced an element.
-  RxStream<T> zipArray(Iterable<Stream<T>> streams) =>
+  RxStream<List<T>> zipArray(Iterable<Stream<T>> streams) =>
       Combinations.zipArray(_streamWith(streams));
 
   /// Projects each element of a stream to a stream and merges the resulting
