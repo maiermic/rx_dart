@@ -84,6 +84,15 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   RxStream<T> delay(Duration duration) =>
       asyncMap((event) => new Future.delayed(duration, () => event));
 
+  /// Invokes an action for each element of the observable sequence.
+  /// This method can be used for debugging, logging, etc. of query behavior by
+  /// intercepting the message stream to run arbitrary actions for messages on
+  /// the pipeline.
+  RxStream<T> doOnNext(action(T event)) => map((event) {
+    action(event);
+    return event;
+  });
+
   /// Projects each element of a stream to a stream and merges the resulting
   /// streams into one stream.
   RxStream flatMap(Stream selector(T value)) {
