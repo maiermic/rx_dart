@@ -100,9 +100,9 @@ void main() {
     });
 
     group('with seed', () {
-      test('on empty stream completes empty', () {
+      test('on empty stream completes with seed', () {
         var stream = new RxStream.empty().scan(_sum, 4);
-        expect(stream.isEmpty, completion(isTrue));
+        expect(stream.toList(), completion(equals([4])));
       });
 
       test('on single element stream emits element', () {

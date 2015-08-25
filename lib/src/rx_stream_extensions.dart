@@ -122,7 +122,7 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
         controller.add(acc);
         return combine(acc, element);
       }).then((last) {
-        if (!identical(init, last)) {
+        if (!identical(controller, last)) {
           controller.add(last);
         }
         controller.close();
