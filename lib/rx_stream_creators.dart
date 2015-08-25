@@ -4,7 +4,12 @@
 /// Functions to create streams.
 library rx_dart.creators;
 
+import 'dart:async';
+
 import 'package:rx_dart/rx_dart.dart';
 
 /// Returns a stream that contains a single element.
 RxStream just(value) => new RxStream.fromIterable([value]);
+
+/// Converts stream to [RxStream].
+RxStream rx(Stream stream) => new RxStream(stream);
