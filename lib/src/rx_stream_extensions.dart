@@ -42,26 +42,6 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(source);
   }
 
-  /// Prepends [stream] to [streams].
-  Iterable<Stream<T>> _streamWith(Iterable<Stream<T>> streams) =>
-      new List<Stream<T>>()
-          ..add(stream)
-          ..addAll(streams);
-
-  /// Prepend a sequence of values to this stream.
-  RxStream<T> startWith(Iterable<T> values) {
-    StreamController<T> controller;
-    onListen() async {
-      for (T value in values) {
-        controller.add(value);
-      }
-      await controller.addStream(stream);
-      controller.close();
-    }
-    controller = new StreamController<T>(sync: true, onListen: onListen);
-    return new RxStream<T>(controller.stream);
-  }
-
   /// Merges this stream with all of the specified streams into one stream by
   /// using the selector function whenever any of the streams produces an
   /// element. If the result selector is omitted, a list with the elements will
@@ -99,22 +79,6 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(controller.stream);
   }
 
-  /// Merges this stream with all of the specified streams into a single stream.
-  RxStream<T> merge(Iterable<Stream<T>> streams) =>
-      Combinations.merge(_streamWith(streams));
-
-  /// Merges this stream with all the specified streams into one stream by
-  /// using the selector function whenever all of the streams have produced
-  /// an element at a corresponding index.
-  RxStream zip(Iterable<Stream<T>> streams, Function resultSelector) =>
-      Combinations.zip(_streamWith(streams), resultSelector);
-
-  /// Merges this stream with all the specified streams into one stream by
-  /// emitting a list with the elements of the stream at corresponding indexes
-  /// whenever all of the streams have produced an element.
-  RxStream<List<T>> zipArray(Iterable<Stream<T>> streams) =>
-      Combinations.zipArray(_streamWith(streams));
-
   /// Projects each element of a stream to a stream and merges the resulting
   /// streams into one stream.
   RxStream flatMap(Stream selector(T value)) {
@@ -136,6 +100,10 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     controller = new StreamController(sync: true, onListen: onListen);
     return new RxStream(controller.stream);
   }
+
+  /// Merges this stream with all of the specified streams into a single stream.
+  RxStream<T> merge(Iterable<Stream<T>> streams) =>
+      Combinations.merge(_streamWith(streams));
 
   /// Applies an accumulator function over a stream and returns each
   /// intermediate result. The optional seed value is used as the initial
@@ -162,4 +130,36 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     }();
     return new RxStream(controller.stream);
   }
+
+  /// Prepend a sequence of values to this stream.
+  RxStream<T> startWith(Iterable<T> values) {
+    StreamController<T> controller;
+    onListen() async {
+      for (T value in values) {
+        controller.add(value);
+      }
+      await controller.addStream(stream);
+      controller.close();
+    }
+    controller = new StreamController<T>(sync: true, onListen: onListen);
+    return new RxStream<T>(controller.stream);
+  }
+
+  /// Merges this stream with all the specified streams into one stream by
+  /// using the selector function whenever all of the streams have produced
+  /// an element at a corresponding index.
+  RxStream zip(Iterable<Stream<T>> streams, Function resultSelector) =>
+      Combinations.zip(_streamWith(streams), resultSelector);
+
+  /// Merges this stream with all the specified streams into one stream by
+  /// emitting a list with the elements of the stream at corresponding indexes
+  /// whenever all of the streams have produced an element.
+  RxStream<List<T>> zipArray(Iterable<Stream<T>> streams) =>
+      Combinations.zipArray(_streamWith(streams));
+
+  /// Prepends [stream] to [streams].
+  Iterable<Stream<T>> _streamWith(Iterable<Stream<T>> streams) =>
+      new List<Stream<T>>()
+        ..add(stream)
+        ..addAll(streams);
 }
