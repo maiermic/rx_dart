@@ -12,4 +12,9 @@ import 'package:rx_dart/rx_dart.dart';
 RxStream just(value) => new RxStream.fromIterable([value]);
 
 /// Converts stream to [RxStream].
-RxStream rx(Stream stream) => new RxStream(stream);
+RxStream rx(data) {
+  if (data is Stream) return new RxStream(data);
+  if (data is Future) return new RxStream.fromFuture(data);
+  if (data is Iterable) return new RxStream.fromIterable(data);
+  throw new ArgumentError.value(data);
+}
