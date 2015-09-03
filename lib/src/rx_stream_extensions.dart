@@ -125,19 +125,21 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   RxStream scan(combine(acc, T element), [seed]) {
     var controller = new StreamController(sync: true);
     () async {
-      var init = (seed != null ? seed : controller);
+      stream = stream.asBroadcastStream();
+      final isEmpty = stream.isEmpty;
+      final init = (seed != null ? seed : controller);
       stream.fold(init, (acc, T element) {
-        if (identical(init, acc)) {
-          if (init == seed) {
-            return combine(acc, element);
-          }
+        if (identical(acc, controller)) {
+          controller.add(element);
           return element;
         }
-        controller.add(acc);
-        return combine(acc, element);
-      }).then((last) {
-        if (!identical(controller, last)) {
-          controller.add(last);
+        final combination = combine(acc, element);
+        controller.add(combination);
+        return combination;
+      }).then((last) async {
+        // add seed if stream is empty and seed is defined
+        if (await isEmpty && seed != null) {
+          controller.add(seed);
         }
         controller.close();
       });
