@@ -33,6 +33,16 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   /// continue.
   RxStream.fromIterable(Iterable<T> data) : this(new Stream.fromIterable(data));
 
+  /// Creates a stream that repeatedly emits events at [period] intervals.
+  ///
+  /// The event values are computed by invoking [computation]. The argument to
+  /// this callback is an integer that starts with 0 and is incremented for
+  /// every event.
+  ///
+  /// If [computation] is omitted the event values will all be `null`.
+  RxStream.periodic(Duration period, [T computation(int computationCount)])
+      : this(new Stream.periodic(period, computation));
+
   /// Create a new stream wrapper instance that wraps [source].
   ///
   /// This method is needed by the super class [StreamWrapper] to be able to
