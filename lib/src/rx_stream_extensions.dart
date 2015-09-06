@@ -173,7 +173,7 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
 
   /// Transforms a stream of streams into a stream producing values only from
   /// the most recent stream.
-  RxStream switchLatest() => this.flatMap((stream) => stream);
+  RxStream switchLatest() => this.concatMap((stream) => stream);
 
   /// Merges this stream with all the specified streams into one stream by
   /// using the selector function whenever all of the streams have produced
