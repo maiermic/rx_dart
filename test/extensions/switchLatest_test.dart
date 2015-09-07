@@ -53,5 +53,37 @@ void main() {
             onCompleted(270)
           ], maxDeviation: 20));
     });
+
+    test('on stream of intersecting streams only emits elements of last received stream', () async {
+      final scheduler = new TestScheduler();
+
+      final source = scheduler.createStream([
+        onNext(50, scheduler.createStream([
+          onNext(100, 's1.1'),
+          onNext(150, 's1.2'),
+          onNext(200, 's1.3'),
+          onCompleted(210)
+        ])),
+        onNext(170, scheduler.createStream([
+          onNext(180, 's2.1'),
+          onNext(220, 's2.2'),
+          onCompleted(250)
+        ])),
+        onCompleted(180)
+      ]);
+
+      final result = await scheduler
+          .startWithCreate(() => rx(source).switchLatest());
+
+      expect(
+          result,
+          equalsRecords([
+            onNext(100, 's1.1'),
+            onNext(150, 's1.2'),
+            onNext(180, 's2.1'),
+            onNext(220, 's2.2'),
+            onCompleted(250)
+          ], maxDeviation: 20));
+    });
   });
 }
