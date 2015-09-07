@@ -3,11 +3,9 @@
 
 library rx_dart.test;
 
-import 'dart:async';
-import 'dart:io';
-
 import 'package:rx_dart/rx_dart.dart';
 import 'package:rx_dart/rx_stream_creators.dart';
+import 'package:stream_test_scheduler/stream_test_scheduler.dart';
 import 'package:test/test.dart';
 
 
@@ -24,13 +22,36 @@ void main() {
     });
 
     test('on stream of streams emitting elements after previous streams have been completed', () async {
-      final controller = new StreamController(sync: true);
-      var stream = new RxStream(controller.stream).switchLatest();
-      expect(stream.toList(), completion(equals([1, 2, 3, 4, 5])));
-      controller.add(new RxStream.fromIterable([1, 2, 3]));
-      sleep(const Duration(milliseconds: 10));
-      controller.add(new RxStream.fromIterable([4, 5]));
-      controller.close();
+      final scheduler = new TestScheduler();
+
+      final source = scheduler.createStream([
+        onNext(30, scheduler.createStream([
+          onNext(60, 's1.1'),
+          onNext(90, 's1.2'),
+          onNext(120, 's1.3'),
+          onCompleted(150)
+        ])),
+        onNext(180, scheduler.createStream([
+          onNext(210, 's2.1'),
+          onNext(240, 's2.2'),
+          onCompleted(270)
+        ])),
+        onCompleted(190)
+      ]);
+
+      final result = await scheduler
+          .startWithCreate(() => rx(source).switchLatest());
+
+      expect(
+          result,
+          equalsRecords([
+            onNext(60, 's1.1'),
+            onNext(90, 's1.2'),
+            onNext(120, 's1.3'),
+            onNext(210, 's2.1'),
+            onNext(240, 's2.2'),
+            onCompleted(270)
+          ], maxDeviation: 20));
     });
   });
 }
