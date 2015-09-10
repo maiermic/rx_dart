@@ -8,6 +8,12 @@ import 'dart:async';
 
 import 'package:rx_dart/rx_dart.dart';
 
+/// Creates an empty broadcast stream.
+///
+/// This is a stream which does nothing except sending a done event
+/// when it's listened to.
+RxStream empty() => new RxStream.empty();
+
 /// Returns a stream that contains a single element.
 RxStream just(value) => new RxStream.fromIterable([value]);
 
