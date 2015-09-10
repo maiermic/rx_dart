@@ -65,7 +65,7 @@ void main() {
     test('two non broadcast streams one after another', () {
       var s1 = new Stream<int>.fromIterable([0, 1]);
       var s2 = new Stream<int>.fromIterable([2, 3, 4]);
-      RxStream<int> stream = zipArray([s1, s2]);
+      RxStream<List<int>> stream = zipArray([s1, s2]);
       expect(stream.toList(), completion(equals([[0, 2], [1, 3]])));
     });
   });
