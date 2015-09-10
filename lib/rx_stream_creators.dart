@@ -14,6 +14,10 @@ import 'package:rx_dart/rx_dart.dart';
 /// when it's listened to.
 RxStream empty() => new RxStream.empty();
 
+/// Returns a stream that produces a value after each period of milliseconds.
+RxStream interval(milliseconds) =>
+    new RxStream.periodic(new Duration(milliseconds: milliseconds), (i) => i);
+
 /// Returns a stream that contains a single element.
 RxStream just(value) => new RxStream.fromIterable([value]);
 
