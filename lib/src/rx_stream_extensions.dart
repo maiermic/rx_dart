@@ -171,6 +171,29 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream<T>(controller.stream);
   }
 
+  /// Transforms a stream of streams into a stream producing values only from
+  /// the most recent stream.
+  RxStream switchLatest() {
+    final controller = new StreamController(sync: true);
+    bool sourceIsDone = false;
+    bool subscriptionIsDone = false;
+    StreamSubscription subscription;
+    stream.listen((next) {
+      if (subscription != null) subscription.cancel();
+      subscriptionIsDone = false;
+      subscription = next.listen(controller.add, onDone: () {
+        if (sourceIsDone) controller.close();
+        subscriptionIsDone = true;
+      });
+    }, onDone: () {
+      if (subscription == null || subscriptionIsDone) {
+        controller.close();
+      }
+      sourceIsDone = true;
+    });
+    return new RxStream(controller.stream);
+  }
+
   /// Merges this stream with all the specified streams into one stream by
   /// using the selector function whenever all of the streams have produced
   /// an element at a corresponding index.
