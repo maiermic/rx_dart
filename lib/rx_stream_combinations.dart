@@ -10,7 +10,7 @@ import 'package:async/async.dart';
 /// Merges all of the specified streams into one stream by using the selector
 /// function whenever any of the streams produces an element. If the result
 /// selector is omitted, a list with the elements will be yielded.
-RxStream combineLatest(Iterable<Stream> streams) {
+RxStream combineLatest(Iterable<Stream> streams, [Function select]) {
   var controller = new StreamController(sync: true);
   var latestValues = new Map<Stream, dynamic>();
   var pairs =
@@ -22,7 +22,10 @@ RxStream combineLatest(Iterable<Stream> streams) {
     }
   }
   merge(pairs).listen(onListen, onDone: controller.close);
-  return new RxStream(controller.stream);
+  final result = new RxStream(controller.stream);
+  return select == null
+    ? result
+    : result.map((args) => Function.apply(select, args));
 }
 
 class _Pair {
