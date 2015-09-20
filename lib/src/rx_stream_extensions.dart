@@ -125,6 +125,17 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(controller.stream);
   }
 
+  /// Transform the items emitted by a stream into streams, and mirror those
+  /// items emitted by the most-recently transformed stream.
+  /// The flatMapLatest operator is similar to the flatMap and concatMap
+  /// methods described above, however, rather than emitting all of the items
+  /// emitted by all of the streams that the operator generates by transforming
+  /// items from the source stream, flatMapLatest instead emits items from each
+  /// such transformed stream only until the next such stream is emitted, then
+  /// it ignores the previous one and begins emitting items emitted by the new
+  /// one.
+  RxStream flatMapLatest(Stream selector(T value)) => map(selector).switchLatest();
+
   /// Merges this stream with all of the specified streams into a single stream.
   RxStream<T> merge(Iterable<Stream<T>> streams) =>
       Combinations.merge(_streamWith(streams));
