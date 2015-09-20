@@ -89,6 +89,11 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(controller.stream);
   }
 
+  /// Ignores values from an observable sequence which are followed by another
+  /// value within a computed debounced duration.
+  RxStream<T> debounce(Duration duration) =>
+      flatMapLatest((value) => new Stream.periodic(duration, (_) => value).take(1));
+
   /// Time shifts the stream by [duration].
   /// The relative time intervals between the values are preserved.
   RxStream<T> delay(Duration duration) =>
