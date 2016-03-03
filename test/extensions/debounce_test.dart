@@ -14,6 +14,30 @@ void main() {
       expect(stream.toList(), completion(equals([])));
     });
 
+    test('debounce all pass', () async {
+      var scheduler = new TestScheduler();
+
+      var source = scheduler.createStream([
+        onNext(100, 1),
+        onNext(200, 2),
+        onNext(350, 3),
+        onCompleted(400)
+      ]);
+
+      var result = await scheduler
+          .startWithCreate(() => rx(source).debounce(ms(50)));
+
+      expect(
+          result,
+          equalsRecords([
+            onNext(150, 1),
+            onNext(250, 2),
+            onNext(400, 3),
+            onCompleted(400)
+          ], maxDeviation: 20)
+      );
+    });
+
     test('emits only latest element in the time window', () async {
       final scheduler = new TestScheduler();
 
@@ -21,17 +45,20 @@ void main() {
         onNext(30, 1),
         onNext(40, 2),
         onNext(50, 3),
-        onCompleted(50)
+        onNext(100, 4),
+        onNext(250, 5),
+        onCompleted(250)
       ]);
 
       final result = await scheduler
-          .startWithCreate(() => rx(source).debounce(ms(30)));
+          .startWithCreate(() => rx(source).debounce(ms(100)));
 
       expect(
           result,
           equalsRecords([
-            onNext(80, 3),
-            onCompleted(80)
+            onNext(200, 4),
+            onNext(350, 5),
+            onCompleted(350)
           ], maxDeviation: 20)
       );
     });
