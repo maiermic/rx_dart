@@ -210,6 +210,22 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(controller.stream);
   }
 
+  /// Merges the specified streams into one stream by using the selector
+  /// function only when the source stream (the instance) produces an element.
+  /// If the result selector is omitted, a list with the elements will be
+  /// yielded.
+  RxStream withLatestFrom(Iterable<Stream> streams, Function select) {
+    Iterable latest;
+    Combinations.combineLatest(streams).listen((l) => latest = l);
+    return map(
+      (instanceStreamElement) {
+        final latestValues = [instanceStreamElement]..addAll(latest);
+        return select == null
+          ? latestValues
+          : Function.apply(select, latestValues);
+      });
+  }
+
   /// Merges this stream with all the specified streams into one stream by
   /// using the selector function whenever all of the streams have produced
   /// an element at a corresponding index.
