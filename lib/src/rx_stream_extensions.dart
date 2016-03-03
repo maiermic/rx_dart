@@ -97,7 +97,7 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   /// Time shifts the stream by [duration].
   /// The relative time intervals between the values are preserved.
   RxStream<T> delay(Duration duration) =>
-      asyncMap((event) => new Future.delayed(duration, () => event));
+      flatMap((event) => new RxStream.fromFuture(new Future.delayed(duration, () => event)));
 
   /// Invokes an action for each element of the observable sequence.
   /// This method can be used for debugging, logging, etc. of query behavior by

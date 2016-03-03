@@ -24,15 +24,15 @@ void main() {
         onCompleted(100)
       ]);
 
-      final result = await scheduler.startWithCreate(() => rx(source).delay(new Duration(milliseconds: 30)));
+      final result = await scheduler.startWithCreate(() => rx(source).delay(new Duration(milliseconds: 1000)));
 
       expect(
           result,
           equalsRecords([
-            onNext(60, 1),
-            onNext(90, 2),
-            onNext(120, 3),
-            onCompleted(120)
+            onNext(1030, 1),
+            onNext(1060, 2),
+            onNext(1090, 3),
+            onCompleted(1100)
           ], maxDeviation: 20)
       );
     });
