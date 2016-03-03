@@ -14,6 +14,14 @@ void main() {
       expect(stream.toList(), completion(equals([0, 1])));
     });
 
+    test('called twice', () {
+      var stream = new RxStream.empty().startWith([2, 3]).asBroadcastStream();
+      final s1 = stream.startWith([0, 1]);
+      final s2 = stream.startWith([0, 1]);
+      expect(s1.toList(), completion(equals([0, 1, 2, 3])));
+      expect(s2.toList(), completion(equals([0, 1, 2, 3])));
+    });
+
     test('on stream emits start values followed by stream values', () {
       var stream = new RxStream.fromIterable([2, 3]).startWith([0, 1]);
       expect(stream.toList(), completion(equals([0, 1, 2, 3])));
