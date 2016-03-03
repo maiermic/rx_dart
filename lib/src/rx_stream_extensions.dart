@@ -174,18 +174,8 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   }
 
   /// Prepend a sequence of values to this stream.
-  RxStream<T> startWith(Iterable<T> values) {
-    StreamController<T> controller;
-    onListen() async {
-      for (T value in values) {
-        controller.add(value);
-      }
-      await controller.addStream(stream);
-      controller.close();
-    }
-    controller = new StreamController<T>(sync: true, onListen: onListen);
-    return new RxStream<T>(controller.stream);
-  }
+  RxStream<T> startWith(Iterable<T> values) =>
+      Combinations.concat([new RxStream.fromIterable(values), stream]);
 
   /// Transforms a stream of streams into a stream producing values only from
   /// the most recent stream.
