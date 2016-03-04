@@ -14,7 +14,7 @@ void main() {
       expect(stream.toList(), completion(equals([])));
     });
 
-    test('debounce all pass', () async {
+    test('all pass', () async {
       var scheduler = new TestScheduler();
 
       var source = scheduler.createStream([
