@@ -56,8 +56,8 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
   /// using the selector function whenever any of the streams produces an
   /// element. If the result selector is omitted, a list with the elements will
   /// be yielded.
-  RxStream<T> combineLatest(Iterable<Stream<T>> streams) =>
-      Combinations.combineLatest(_streamWith(streams));
+  RxStream<T> combineLatest(Iterable<Stream<T>> streams, [Function select]) =>
+      Combinations.combineLatest(_streamWith(streams), select);
 
   /// Concatenates this stream with all of the specified streams, as long as
   /// the previous observable sequence terminated successfully.
