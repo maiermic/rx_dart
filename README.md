@@ -5,6 +5,7 @@ The [Reactive Extensions](http://reactivex.io) for Dart Streams (unofficial).
 ## Related Libraries
 
   - [frankpepermans / rxdart](https://github.com/frankpepermans/rxdart)
+  - [danschultz / frappe](https://github.com/danschultz/frappe)
   - [theburningmonk / stream_ext](https://github.com/theburningmonk/stream_ext)
   - [maiermic / stream_test_scheduler](https://github.com/maiermic/stream_test_scheduler)
 
