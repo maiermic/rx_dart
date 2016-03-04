@@ -196,7 +196,7 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
         controller.close();
       }
       sourceIsDone = true;
-    });
+    }, onError: controller.addError);
     return new RxStream(controller.stream);
   }
 
