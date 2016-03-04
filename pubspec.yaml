@@ -1,6 +1,6 @@
 name: rx_dart
 description: The Reactive Extensions for Dart Streams.
-version: 0.0.1
+version: 1.0.0
 author: Michael Maier <maier1michael@gmail.com>
 homepage: https://github.com/maiermic/rx_dart
 
@@ -10,3 +10,5 @@ environment:
 dev_dependencies:
   test: '>=0.12.0 <0.13.0'
   stream_test_scheduler: '>=0.2.0 <0.3.0'
+  # used in examples:
+  jsonp: '^2.0.1'
