@@ -200,6 +200,27 @@ class RxStream<T> extends StreamWrapper<T, RxStream> with StreamWrapperType<T, R
     return new RxStream(controller.stream);
   }
 
+  /// Returns the values from the source stream until the other stream produces
+  /// a value.
+  RxStream<T> takeUntil(Stream other) {
+    StreamController controller;
+    onListen() async {
+      var subscription = stream.listen(
+          controller.add,
+          onDone: controller.close,
+          onError: controller.addError
+      );
+      other.listen(
+          (_) {
+            subscription.cancel();
+            controller.close();
+          }
+      );
+    }
+    controller = new StreamController(sync: true, onListen: onListen);
+    return new RxStream(controller.stream);
+  }
+
   /// Merges the specified streams into one stream by using the selector
   /// function only when the source stream (the instance) produces an element.
   /// If the result selector is omitted, a list with the elements will be
